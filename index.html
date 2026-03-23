@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoisinSerein — La communication de copropriété réinventée par l'IA</title>
+<meta name="description" content="VoisinSerein utilise l'Intelligence Artificielle pour transformer les échanges entre voisins. Forum intelligent, syndic virtuel, médiation CNV.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:title" content="VoisinSerein — Communication de copropriété par l'IA">
+<meta property="og:description" content="Forum intelligent, syndic virtuel, médiation CNV. Chaque message est reformulé par l'IA pour favoriser le dialogue entre voisins.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.voisins.ai">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VoisinSerein — Communication de copropriété par l'IA">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fg: #111;
+  --fg2: #555;
+  --fg3: #999;
+  --bg: #FAFAF7;
+  --bg2: #F0EDE6;
+  --bg3: #E6E1D8;
+  --green: #2C5530;
+  --green-light: #3A6B3E;
+  --green-pale: #E8F0E9;
+  --gold: #C9963B;
+  --gold-pale: #F9F0DD;
+  --white: #FFFFFF;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --font: 'Outfit', sans-serif;
+  --font-display: 'Instrument Serif', serif;
+  --max-w: 1200px;
+  --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); color: var(--fg); background: var(--bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--green); color: white; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  30% { transform: translate(3%, -15%); }
+  50% { transform: translate(12%, 9%); }
+  70% { transform: translate(9%, 4%); }
+  90% { transform: translate(-1%, 7%); }
+}
+
+.reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── GRAIN OVERLAY ─── */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+  background: rgba(250, 250, 247, 0.85); backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  transition: all 0.3s;
+}
+nav .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
+nav .logo span { font-family: var(--font-display); font-size: 22px; }
+nav .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+nav .nav-links { display: flex; gap: 32px; align-items: center; }
+nav .nav-links a { text-decoration: none; color: var(--fg2); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+nav .nav-links a:hover { color: var(--fg); }
+nav .cta-btn {
+  background: var(--green); color: white; border: none; padding: 10px 22px;
+  border-radius: 100px; font-family: var(--font); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
+}
+nav .cta-btn:hover { background: var(--green-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(44,85,48,0.3); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh; padding: 120px 32px 60px;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+.hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 70vh;
+  background: radial-gradient(ellipse at 30% 20%, rgba(44,85,48,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 60%, rgba(201,150,59,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-pale); border: 1px solid rgba(44,85,48,0.15);
+  padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 500;
+  color: var(--green); margin-bottom: 24px;
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease infinite; }
+.hero h1 {
+  font-family: var(--font-display); font-size: clamp(40px, 6vw, 72px);
+  line-height: 1.05; text-align: center; max-width: 800px;
+  color: var(--fg); font-weight: 400; letter-spacing: -0.02em;
+  animation: fadeUp 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero h1 em { font-style: italic; color: var(--green); }
+.hero .hero-sub {
+  font-size: 18px; color: var(--fg2); text-align: center; max-width: 520px;
+  line-height: 1.6; margin-top: 20px; font-weight: 400;
+  animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-ctas {
+  display: flex; gap: 12px; margin-top: 32px;
+  animation: fadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.btn-primary {
+  background: var(--green); color: white; border: none; padding: 14px 28px;
+  border-radius: 100px; font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover { background: var(--green-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(44,85,48,0.25); }
+.btn-secondary {
+  background: transparent; color: var(--fg); border: 1.5px solid var(--bg3);
+  padding: 14px 28px; border-radius: 100px; font-family: var(--font); font-size: 15px;
+  font-weight: 500; cursor: pointer; transition: all 0.3s; text-decoration: none;
+}
+.btn-secondary:hover { border-color: var(--fg3); background: var(--white); }
+
+/* ─── PHONE FRAME ─── */
+.phone-showcase {
+  margin-top: 48px; position: relative; z-index: 1;
+  animation: fadeUp 1s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.phone-frame {
+  width: 375px; height: 740px; border-radius: 40px;
+  background: #111; padding: 12px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05), inset 0 0 0 2px rgba(255,255,255,0.05);
+  position: relative;
+}
+.phone-frame::before {
+  content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 28px; background: #111; border-radius: 0 0 16px 16px; z-index: 10;
+}
+.phone-frame iframe {
+  width: 100%; height: 100%; border: none; border-radius: 30px;
+  background: #F6F2EB;
+}
+.phone-glow {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(44,85,48,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+}
+.interact-hint {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 16px; font-size: 13px; color: var(--fg3); font-weight: 500;
+  animation: fadeIn 1s 1.5s both;
+}
+.interact-hint .hand { animation: float 2s ease-in-out infinite; display: inline-block; }
+
+/* ─── SOCIAL PROOF ─── */
+.social-proof {
+  padding: 40px 32px; display: flex; align-items: center; justify-content: center; gap: 48px;
+  border-top: 1px solid var(--bg3); border-bottom: 1px solid var(--bg3);
+  flex-wrap: wrap;
+}
+.social-proof .stat { text-align: center; }
+.social-proof .stat-num { font-family: var(--font-display); font-size: 36px; color: var(--green); }
+.social-proof .stat-label { font-size: 13px; color: var(--fg3); margin-top: 2px; }
+
+/* ─── PROBLEM ─── */
+.section { padding: 100px 32px; max-width: var(--max-w); margin: 0 auto; }
+.section-label {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--green); margin-bottom: 16px;
+}
+.section h2 {
+  font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1; color: var(--fg); max-width: 600px;
+}
+.section h2 em { font-style: italic; color: var(--gold); }
+.section .section-desc { font-size: 17px; color: var(--fg2); line-height: 1.6; max-width: 520px; margin-top: 16px; }
+
+.problem-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px;
+}
+.problem-card {
+  background: var(--white); border-radius: var(--radius); padding: 28px 24px;
+  border: 1px solid var(--bg3); transition: all var(--transition);
+  position: relative; overflow: hidden;
+}
+.problem-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-pale)); opacity: 0;
+  transition: opacity 0.3s;
+}
+.problem-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+.problem-card:hover::before { opacity: 1; }
+.problem-num { font-family: var(--font-display); font-size: 48px; color: var(--bg3); line-height: 1; margin-bottom: 12px; }
+.problem-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+.problem-card p { font-size: 14px; color: var(--fg2); line-height: 1.55; }
+
+/* ─── HOW IT WORKS ─── */
+.how-section { background: var(--fg); color: white; padding: 100px 32px; }
+.how-section .section-label { color: var(--gold); }
+.how-section h2 { color: white; }
+.how-section h2 em { color: var(--gold); }
+.how-section .section-desc { color: rgba(255,255,255,0.6); }
+
+.how-flow { display: flex; gap: 0; margin-top: 56px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+.how-step {
+  flex: 1; min-width: 200px; max-width: 260px; text-align: center; padding: 0 16px;
+  position: relative;
+}
+.how-step::after {
+  content: '→'; position: absolute; top: 28px; right: -10px;
+  font-size: 20px; color: rgba(255,255,255,0.2);
+}
+.how-step:last-child::after { display: none; }
+.how-step .step-icon {
+  width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.how-step:nth-child(1) .step-icon { background: rgba(41,128,185,0.15); }
+.how-step:nth-child(2) .step-icon { background: rgba(201,150,59,0.15); }
+.how-step:nth-child(3) .step-icon { background: rgba(39,174,96,0.15); }
+.how-step:nth-child(4) .step-icon { background: rgba(142,68,173,0.15); }
+.how-step h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.how-step p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* ─── FEATURES ─── */
+.features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px; }
+.feature-card {
+  background: var(--white); border: 1px solid var(--bg3); border-radius: var(--radius-lg);
+  padding: 32px 28px; transition: all var(--transition);
+  position: relative;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.06); }
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center;
+  justify-content: center; font-size: 22px; margin-bottom: 16px;
+}
+.feature-card h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 8px; }
+.feature-card p { font-size: 14px; color: var(--fg2); line-height: 1.6; }
+.feature-tag {
+  display: inline-block; margin-top: 12px; padding: 4px 10px; border-radius: 100px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+}
+
+/* ─── CNV SPOTLIGHT ─── */
+.cnv-section { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); padding: 100px 32px; }
+.cnv-steps-visual { display: flex; gap: 16px; margin-top: 48px; flex-wrap: wrap; justify-content: center; }
+.cnv-step-card {
+  flex: 1; min-width: 220px; max-width: 260px;
+  border-radius: var(--radius-lg); padding: 28px 24px;
+  text-align: center; transition: all var(--transition);
+  border: 2px solid transparent; background: var(--white);
+}
+.cnv-step-card:hover { transform: translateY(-6px); }
+.cnv-step-card:nth-child(1) { border-color: rgba(41,128,185,0.2); }
+.cnv-step-card:nth-child(2) { border-color: rgba(39,174,96,0.2); }
+.cnv-step-card:nth-child(3) { border-color: rgba(230,126,34,0.2); }
+.cnv-step-card:nth-child(4) { border-color: rgba(142,68,173,0.2); }
+.cnv-step-card .cnv-icon { font-size: 36px; margin-bottom: 12px; }
+.cnv-step-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.cnv-step-card p { font-size: 13px; color: var(--fg2); line-height: 1.5; }
+
+/* ─── PRICING ─── */
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+.price-card {
+  background: var(--white); border: 1px solid var(--bg3); border-radius: var(--radius-lg);
+  padding: 32px 24px; position: relative; transition: all var(--transition);
+}
+.price-card.featured { border: 2px solid var(--green); box-shadow: 0 8px 32px rgba(44,85,48,0.1); }
+.price-card.featured::before {
+  content: 'Recommandé'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: white; font-size: 11px; font-weight: 600;
+  padding: 4px 14px; border-radius: 100px;
+}
+.price-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.price-card .price { font-family: var(--font-display); font-size: 42px; color: var(--green); margin: 12px 0 4px; }
+.price-card .price-unit { font-size: 13px; color: var(--fg3); }
+.price-card ul { list-style: none; margin-top: 20px; }
+.price-card li { font-size: 14px; color: var(--fg2); padding: 8px 0; border-bottom: 1px solid var(--bg2); display: flex; align-items: center; gap: 8px; }
+.price-card li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 13px; }
+
+/* ─── CTA ─── */
+.cta-section {
+  background: var(--green); color: white; padding: 80px 32px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 60%);
+}
+.cta-section h2 { font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 16px; position: relative; }
+.cta-section p { font-size: 17px; opacity: 0.8; margin-bottom: 32px; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.5; position: relative; }
+.btn-white {
+  background: white; color: var(--green); border: none; padding: 14px 32px;
+  border-radius: 100px; font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s; position: relative;
+}
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+/* ─── FOOTER ─── */
+footer {
+  padding: 48px 32px 24px; border-top: 1px solid var(--bg3);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+  max-width: var(--max-w); margin: 0 auto;
+}
+footer .footer-logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 18px; color: var(--fg); }
+footer .footer-links { display: flex; gap: 24px; }
+footer .footer-links a { text-decoration: none; font-size: 13px; color: var(--fg3); transition: color 0.2s; }
+footer .footer-links a:hover { color: var(--fg); }
+footer .footer-copy { font-size: 12px; color: var(--fg3); width: 100%; text-align: center; margin-top: 24px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  nav { padding: 12px 20px; }
+  nav .nav-links a { display: none; }
+  .hero { padding: 100px 20px 40px; }
+  .phone-frame { width: 320px; height: 640px; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .how-flow { flex-direction: column; align-items: center; }
+  .how-step::after { display: none; }
+  .section { padding: 60px 20px; }
+  .social-proof { gap: 24px; }
+  .cnv-steps-visual { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">🏡</div>
+    <span>VoisinSerein</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Fonctionnalités</a>
+    <a href="#mediation">Médiation CNV</a>
+    <a href="#pricing">Tarifs</a>
+    <a href="#demo">Démo</a>
+    <button class="cta-btn" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Demander une démo</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="demo">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Nouveau · Médiation CNV intégrée
+  </div>
+  <h1>Des voisins qui se parlent,<br>pas qui <em>s'affrontent</em></h1>
+  <p class="hero-sub">VoisinSerein réinvente la communication en copropriété grâce à l'IA. Chaque message est reformulé pour favoriser le dialogue.</p>
+  <div class="hero-ctas">
+    <a href="#cta" class="btn-primary">Essai gratuit 3 mois →</a>
+    <a href="#features" class="btn-secondary">Découvrir</a>
+  </div>
+
+  <!-- PHONE WITH LIVE PROTOTYPE -->
+  <div class="phone-showcase">
+    <div class="phone-glow"></div>
+    <div class="phone-frame">
+      <iframe src="https://app.voisins.ai" title="VoisinSerein - Prototype interactif" loading="lazy"></iframe>
+    </div>
+  </div>
+  <div class="interact-hint">
+    <span class="hand">👆</span> Cliquez dans le prototype — c'est interactif
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<div class="social-proof reveal">
+  <div class="stat">
+    <div class="stat-num">65%</div>
+    <div class="stat-label">des copropriétaires ont vécu un conflit</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">3,4 Md€</div>
+    <div class="stat-label">coût annuel des conflits en France</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">78%</div>
+    <div class="stat-label">des litiges naissent d'un problème de communication</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">−60%</div>
+    <div class="stat-label">de messages agressifs avec VoisinSerein</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section reveal" id="problem">
+  <div class="section-label">Le problème</div>
+  <h2>La copropriété, terrain fertile pour les <em>conflits</em></h2>
+  <p class="section-desc">Les groupes WhatsApp, les emails à chaud, les mots dans l'ascenseur — les outils actuels aggravent les tensions au lieu de les résoudre.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card reveal">
+      <div class="problem-num">01</div>
+      <h3>Messages écrits à chaud</h3>
+      <p>Un ton agressif, des accusations, du passif-agressif. Le texte amplifie les émotions là où la voix les atténuerait.</p>
+    </div>
+    <div class="problem-card reveal">
+      <div class="problem-num">02</div>
+      <h3>Règlement invisible</h3>
+      <p>Personne ne lit le règlement de copropriété. Les droits et devoirs de chacun restent flous, alimentant les malentendus.</p>
+    </div>
+    <div class="problem-card reveal">
+      <div class="problem-num">03</div>
+      <h3>Syndic débordé</h3>
+      <p>Le syndic passe 40% de son temps à gérer des conflits entre copropriétaires. Du temps perdu pour tous.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div style="max-width: var(--max-w); margin: 0 auto;">
+    <div class="section-label reveal">Comment ça marche</div>
+    <h2 class="reveal">Quatre étapes pour un message <em>constructif</em></h2>
+    <p class="section-desc reveal">Le voisin écrit librement. L'IA fait le reste.</p>
+
+    <div class="how-flow">
+      <div class="how-step reveal">
+        <div class="step-icon">✍️</div>
+        <h4>Écrire librement</h4>
+        <p>Le voisin tape son message naturellement, même sous le coup de l'émotion.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-icon">✨</div>
+        <h4>L'IA reformule</h4>
+        <p>L'assistant propose 3 versions : diplomatique, chaleureuse, factuelle.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-icon">👆</div>
+        <h4>Choisir son style</h4>
+        <p>Le voisin compare, choisit le ton qui lui ressemble, et valide.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-icon">🕊️</div>
+        <h4>Message envoyé</h4>
+        <p>Le fond est préservé, seul le ton est amélioré. Zéro censure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section reveal" id="features">
+  <div class="section-label">Plateforme complète</div>
+  <h2>Tout ce qu'il faut pour une copropriété <em>apaisée</em></h2>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon" style="background: rgba(44,85,48,0.08);">💬</div>
+      <h3>Forum Intelligent</h3>
+      <p>Chaque message passe par l'assistant IA avant publication. Reformulation en 3 styles, référence automatique au règlement, réactions et fils de discussion.</p>
+      <span class="feature-tag" style="background: var(--green-pale); color: var(--green);">IA intégrée</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon" style="background: rgba(201,150,59,0.08);">⚖️</div>
+      <h3>Syndic Virtuel</h3>
+      <p>Un conseiller juridique IA disponible 24/7. Répond aux questions sur le règlement et la loi, cite les articles pertinents, oriente vers la médiation.</p>
+      <span class="feature-tag" style="background: var(--gold-pale); color: var(--gold);">24h/24 · 7j/7</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon" style="background: rgba(142,68,173,0.08);">🕊️</div>
+      <h3>Médiation CNV</h3>
+      <p>Résolution de conflits guidée par la Communication NonViolente de Marshall Rosenberg. L'IA traduit chaque échange en 4 étapes : Observation, Sentiment, Besoin, Demande.</p>
+      <span class="feature-tag" style="background: #F0E6F6; color: #8E44AD;">Exclusif</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon" style="background: rgba(41,128,185,0.08);">📅</div>
+      <h3>Agenda & Documents</h3>
+      <p>Assemblées générales, travaux, événements. Tous les documents de la copropriété classés et accessibles. Notifications et rappels automatiques.</p>
+      <span class="feature-tag" style="background: #E8F4FC; color: #2980B9;">Tout-en-un</span>
+    </div>
+  </div>
+</section>
+
+<!-- CNV SPOTLIGHT -->
+<section class="cnv-section" id="mediation">
+  <div style="max-width: var(--max-w); margin: 0 auto; text-align: center;">
+    <div class="section-label reveal" style="text-align: center;">Innovation</div>
+    <h2 class="reveal" style="margin: 0 auto; text-align: center;">La <em>Communication NonViolente</em><br>au cœur de la médiation</h2>
+    <p class="section-desc reveal" style="margin: 16px auto 0; text-align: center;">Chaque message de médiation est automatiquement restructuré selon les 4 étapes de Marshall Rosenberg. Votre voisin ne voit jamais votre texte brut — uniquement la version CNV.</p>
+
+    <div class="cnv-steps-visual">
+      <div class="cnv-step-card reveal">
+        <div class="cnv-icon">👁️</div>
+        <h4>Observation</h4>
+        <p>Les faits concrets, sans jugement ni interprétation. "J'ai constaté que..."</p>
+      </div>
+      <div class="cnv-step-card reveal">
+        <div class="cnv-icon">💚</div>
+        <h4>Sentiment</h4>
+        <p>L'émotion authentique. "Je me sens fatigué, frustré, inquiet..."</p>
+      </div>
+      <div class="cnv-step-card reveal">
+        <div class="cnv-icon">🌱</div>
+        <h4>Besoin</h4>
+        <p>Le besoin profond non satisfait. "J'ai besoin de calme, de respect..."</p>
+      </div>
+      <div class="cnv-step-card reveal">
+        <div class="cnv-icon">🤝</div>
+        <h4>Demande</h4>
+        <p>Une demande concrète, positive et négociable. "Serait-il possible de..."</p>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top: 48px; background: var(--white); border-radius: var(--radius-lg); padding: 32px; max-width: 700px; margin-left: auto; margin-right: auto; text-align: left; border: 1px solid var(--bg3);">
+      <p style="font-size: 12px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px;">Exemple de transformation</p>
+      <div style="background: #FDE8E6; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <p style="font-size: 11px; font-weight: 600; color: #C0392B; margin-bottom: 4px;">MESSAGE ORIGINAL</p>
+        <p style="font-size: 15px; color: #333; line-height: 1.5; font-style: italic;">"Le voisin du 5ème fait un boucan pas possible avec ses travaux le dimanche, ça suffit ! Il y a un règlement quand même !"</p>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; margin: -8px 0;">
+        <span style="background: var(--green); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">↓</span>
+      </div>
+      <div style="background: var(--green-pale); border-radius: 12px; padding: 16px; margin-top: 8px;">
+        <p style="font-size: 11px; font-weight: 600; color: var(--green); margin-bottom: 4px;">REFORMULATION CNV</p>
+        <p style="font-size: 14px; color: #333; line-height: 1.6;"><strong style="color: #2980B9;">👁️</strong> J'ai constaté que des travaux ont lieu le dimanche dans l'appartement du 5ème étage. <strong style="color: #27AE60;">💚</strong> Je me sens fatigué et frustré par cette situation. <strong style="color: #E67E22;">🌱</strong> J'ai besoin de calme le week-end pour me reposer. <strong style="color: #8E44AD;">🤝</strong> Serait-il possible de limiter les travaux bruyants aux horaires prévus par le règlement (article 2) ?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section reveal" id="pricing">
+  <div class="section-label" style="text-align: center;">Tarifs</div>
+  <h2 style="text-align: center; margin: 0 auto;">Simple, transparent, <em>abordable</em></h2>
+  <p class="section-desc" style="text-align: center; margin: 16px auto 0;">Abonnement par lot, facturé via le syndic et intégré aux charges de copropriété.</p>
+
+  <div class="pricing-grid">
+    <div class="price-card reveal">
+      <h3>Essentiel</h3>
+      <div class="price">1,50€</div>
+      <div class="price-unit">par lot / mois</div>
+      <ul>
+        <li>Forum intelligent IA</li>
+        <li>Agenda partagé</li>
+        <li>Documents & archives</li>
+        <li>Notifications email</li>
+      </ul>
+      <button class="btn-secondary" style="width: 100%; margin-top: 20px;">Choisir</button>
+    </div>
+    <div class="price-card featured reveal">
+      <h3>Premium</h3>
+      <div class="price">3€</div>
+      <div class="price-unit">par lot / mois</div>
+      <ul>
+        <li>Tout Essentiel +</li>
+        <li>Syndic Virtuel IA 24/7</li>
+        <li>Médiation CNV</li>
+        <li>Tableau de bord syndic</li>
+        <li>Analyse de sentiment</li>
+      </ul>
+      <button class="btn-primary" style="width: 100%; margin-top: 20px; justify-content: center;">Choisir</button>
+    </div>
+    <div class="price-card reveal">
+      <h3>Syndic Pro</h3>
+      <div class="price" style="font-size: 32px;">Sur devis</div>
+      <div class="price-unit">multi-copropriétés</div>
+      <ul>
+        <li>Tout Premium +</li>
+        <li>Gestion multi-copropriétés</li>
+        <li>API & intégrations</li>
+        <li>Support dédié</li>
+      </ul>
+      <button class="btn-secondary" style="width: 100%; margin-top: 20px;">Nous contacter</button>
+    </div>
+  </div>
+  <p style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--fg3);">Exemple : copropriété de 30 lots = 45 à 90€/mois — moins qu'une heure de médiation juridique</p>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <h2>Prêt à transformer la communication<br>dans vos copropriétés ?</h2>
+  <p>Demandez une démonstration personnalisée et bénéficiez d'un pilote gratuit de 3 mois.</p>
+  <button class="btn-white">Demander une démo gratuite →</button>
+  <p style="margin-top: 24px; font-size: 12px; opacity: 0.5;">Pas d'engagement · Mise en place en 48h · Support inclus</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🏡 VoisinSerein</div>
+  <div class="footer-links">
+    <a href="#">Fonctionnalités</a>
+    <a href="#">Tarifs</a>
+    <a href="#">Blog</a>
+    <a href="#">CGU</a>
+    <a href="#">Confidentialité</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 VoisinSerein — Reconnexion.ai · Des voisins qui se parlent, pas qui s'affrontent.</div>
+</footer>
+
+<!-- SCROLL REVEAL -->
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
